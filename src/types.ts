@@ -68,4 +68,21 @@ export interface VikunjaView {
   project_id: number;
   view_kind: number;
   position: number;
+  filter?: string;
+  bucket_configuration_mode?: number;
+  default_bucket_id?: number;
+  done_bucket_id?: number;
+  created?: string;
+  updated?: string;
+}
+
+export interface VikunjaBucket {
+  id: number;
+  title: string;
+  position: number;
+  limit: number;
+  count: number;
+  created: string;
+  updated: string;
+  created_by: VikunjaUser;
 }

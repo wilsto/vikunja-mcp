@@ -1,4 +1,4 @@
-import type { VikunjaProject, VikunjaTask, VikunjaLabel, VikunjaView } from './types.js';
+import type { VikunjaProject, VikunjaTask, VikunjaLabel, VikunjaView, VikunjaBucket } from './types.js';
 
 export class VikunjaClient {
   private baseUrl: string;
@@ -62,6 +62,39 @@ export class VikunjaClient {
   // Views (needed for listing tasks in a project)
   async getProjectViews(projectId: number): Promise<VikunjaView[]> {
     return this.request<VikunjaView[]>('GET', `/projects/${projectId}/views`);
+  }
+
+  async createView(projectId: number, data: { title: string; view_kind: number; filter?: string; bucket_configuration_mode?: number; default_bucket_id?: number; done_bucket_id?: number }): Promise<VikunjaView> {
+    return this.request<VikunjaView>('PUT', `/projects/${projectId}/views`, data);
+  }
+
+  async updateView(projectId: number, viewId: number, data: Partial<{ title: string; filter: string; position: number; bucket_configuration_mode: number; default_bucket_id: number; done_bucket_id: number }>): Promise<VikunjaView> {
+    return this.request<VikunjaView>('POST', `/projects/${projectId}/views/${viewId}`, data);
+  }
+
+  async deleteView(projectId: number, viewId: number): Promise<void> {
+    await this.request<{ message: string }>('DELETE', `/projects/${projectId}/views/${viewId}`);
+  }
+
+  // Buckets
+  async listBuckets(projectId: number, viewId: number): Promise<VikunjaBucket[]> {
+    return this.request<VikunjaBucket[]>('GET', `/projects/${projectId}/views/${viewId}/buckets`);
+  }
+
+  async createBucket(projectId: number, viewId: number, data: { title: string; limit?: number }): Promise<VikunjaBucket> {
+    return this.request<VikunjaBucket>('PUT', `/projects/${projectId}/views/${viewId}/buckets`, data);
+  }
+
+  async updateBucket(projectId: number, viewId: number, bucketId: number, data: Partial<{ title: string; limit: number; position: number }>): Promise<VikunjaBucket> {
+    return this.request<VikunjaBucket>('POST', `/projects/${projectId}/views/${viewId}/buckets/${bucketId}`, data);
+  }
+
+  async deleteBucket(projectId: number, viewId: number, bucketId: number): Promise<void> {
+    await this.request<{ message: string }>('DELETE', `/projects/${projectId}/views/${viewId}/buckets/${bucketId}`);
+  }
+
+  async moveTaskToBucket(projectId: number, viewId: number, data: { task_id: number; bucket_id: number }): Promise<void> {
+    await this.request<unknown>('POST', `/projects/${projectId}/views/${viewId}/buckets/tasks`, data);
   }
 
   // Tasks

@@ -1,6 +1,6 @@
 # vikunja-mcp
 
-MCP server for [Vikunja](https://vikunja.io), the open-source task management app. Provides 16 tools for managing projects, tasks, and labels through Claude Code or any MCP-compatible client.
+MCP server for [Vikunja](https://vikunja.io), the open-source task management app. Provides 25 tools for managing projects, views, kanban buckets, tasks, and labels through Claude Code or any MCP-compatible client.
 
 ## Setup
 
@@ -47,13 +47,26 @@ Or run from a local clone:
 }
 ```
 
-## Tools (16)
+## Tools (25)
 
 ### Projects
 - **vikunja_list_projects** — List all projects
 - **vikunja_create_project** — Create a project (supports nesting via `parent_project_id`)
 - **vikunja_update_project** — Update project title, description, archive status
 - **vikunja_delete_project** — Delete a project and all its tasks
+
+### Views
+- **vikunja_list_views** — List all views for a project (list, kanban, table, gantt)
+- **vikunja_create_view** — Create a new view (view kinds: 0=list, 1=gantt, 2=table, 3=kanban)
+- **vikunja_update_view** — Update a view's title, filter, or bucket configuration
+- **vikunja_delete_view** — Delete a project view
+
+### Buckets (Kanban)
+- **vikunja_list_buckets** — List all buckets (columns) in a kanban view
+- **vikunja_create_bucket** — Create a new bucket with optional WIP limit
+- **vikunja_update_bucket** — Update a bucket's title, WIP limit, or position
+- **vikunja_delete_bucket** — Delete a bucket from a kanban view
+- **vikunja_move_task_to_bucket** — Move a task to a different bucket (column)
 
 ### Tasks
 - **vikunja_list_tasks** — List tasks across all projects (search, filter, sort, paginate)
@@ -86,6 +99,7 @@ This MCP wraps the [Vikunja REST API v1](https://vikunja.io/docs/api/). A few qu
 
 - Vikunja uses **PUT for creation** and **POST for updates** (opposite of typical REST)
 - Listing tasks in a project requires a View ID — the MCP handles this automatically by fetching the first view
+- Since Vikunja v0.22, **buckets are view-level** (not project-level). Use `vikunja_list_views` to find kanban views, then operate on their buckets
 - Dates use ISO 8601 format: `2026-03-15T00:00:00Z`
 - API tokens can be created in Vikunja under Settings > API Tokens
 
