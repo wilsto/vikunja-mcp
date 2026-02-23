@@ -66,14 +66,21 @@ export interface VikunjaView {
   id: number;
   title: string;
   project_id: number;
-  view_kind: number;
+  view_kind: string;
   position: number;
   filter?: string;
-  bucket_configuration_mode?: number;
+  bucket_configuration_mode?: string;
   default_bucket_id?: number;
   done_bucket_id?: number;
   created?: string;
   updated?: string;
+}
+
+export interface VikunjaTaskBucket {
+  task_id: number;
+  bucket_id: number;
+  project_view_id: number;
+  task_done?: boolean;
 }
 
 export interface VikunjaBucket {

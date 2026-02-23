@@ -78,9 +78,9 @@ export function bucketTools(server: McpServer, client: VikunjaClient): void {
       bucket_id: z.number().describe('Target bucket ID'),
     },
   }, async ({ project_id, view_id, task_id, bucket_id }) => {
-    await client.moveTaskToBucket(project_id, view_id, { task_id, bucket_id });
+    const result = await client.moveTaskToBucket(project_id, view_id, bucket_id, task_id);
     return {
-      content: [{ type: 'text', text: `Moved task #${task_id} to bucket #${bucket_id} in view #${view_id}` }],
+      content: [{ type: 'text', text: `Moved task #${result.task_id} to bucket #${result.bucket_id} in view #${view_id}` }],
     };
   });
 }

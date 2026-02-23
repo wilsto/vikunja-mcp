@@ -2,6 +2,21 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 import type { VikunjaClient } from '../client.js';
 
+const createProjectSchema = {
+  title: z.string().describe('Project title'),
+  description: z.string().optional().describe('Project description'),
+  parent_project_id: z.number().optional().describe('Parent project ID for nesting'),
+  hex_color: z.string().optional().describe('Hex color code (e.g., "#ff0000")'),
+} as const;
+
+const updateProjectSchema = {
+  id: z.number().describe('Project ID'),
+  title: z.string().optional().describe('New title'),
+  description: z.string().optional().describe('New description'),
+  is_archived: z.boolean().optional().describe('Archive or unarchive the project'),
+  hex_color: z.string().optional().describe('Hex color code'),
+} as const;
+
 export function projectTools(server: McpServer, client: VikunjaClient): void {
   server.registerTool('vikunja_list_projects', {
     description: 'List all projects the user has access to in Vikunja',
@@ -18,14 +33,10 @@ export function projectTools(server: McpServer, client: VikunjaClient): void {
     };
   });
 
+  // @ts-expect-error TS2589 - MCP SDK deep type instantiation with Zod optional schemas
   server.registerTool('vikunja_create_project', {
     description: 'Create a new project in Vikunja',
-    inputSchema: {
-      title: z.string().describe('Project title'),
-      description: z.string().optional().describe('Project description'),
-      parent_project_id: z.number().optional().describe('Parent project ID for nesting'),
-      hex_color: z.string().optional().describe('Hex color code (e.g., "#ff0000")'),
-    },
+    inputSchema: createProjectSchema,
   }, async ({ title, description, parent_project_id, hex_color }) => {
     const project = await client.createProject({ title, description, parent_project_id, hex_color });
     return {
@@ -33,15 +44,10 @@ export function projectTools(server: McpServer, client: VikunjaClient): void {
     };
   });
 
+  // @ts-expect-error TS2589 - MCP SDK deep type instantiation with Zod optional schemas
   server.registerTool('vikunja_update_project', {
     description: 'Update an existing project in Vikunja',
-    inputSchema: {
-      id: z.number().describe('Project ID'),
-      title: z.string().optional().describe('New title'),
-      description: z.string().optional().describe('New description'),
-      is_archived: z.boolean().optional().describe('Archive or unarchive the project'),
-      hex_color: z.string().optional().describe('Hex color code'),
-    },
+    inputSchema: updateProjectSchema,
   }, async ({ id, ...data }) => {
     const project = await client.updateProject(id, data);
     return {

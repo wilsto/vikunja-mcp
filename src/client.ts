@@ -1,4 +1,4 @@
-import type { VikunjaProject, VikunjaTask, VikunjaLabel, VikunjaView, VikunjaBucket } from './types.js';
+import type { VikunjaProject, VikunjaTask, VikunjaLabel, VikunjaView, VikunjaBucket, VikunjaTaskBucket } from './types.js';
 
 export class VikunjaClient {
   private baseUrl: string;
@@ -64,11 +64,11 @@ export class VikunjaClient {
     return this.request<VikunjaView[]>('GET', `/projects/${projectId}/views`);
   }
 
-  async createView(projectId: number, data: { title: string; view_kind: number; filter?: string; bucket_configuration_mode?: number; default_bucket_id?: number; done_bucket_id?: number }): Promise<VikunjaView> {
+  async createView(projectId: number, data: { title: string; view_kind: string; filter?: string; bucket_configuration_mode?: string; default_bucket_id?: number; done_bucket_id?: number }): Promise<VikunjaView> {
     return this.request<VikunjaView>('PUT', `/projects/${projectId}/views`, data);
   }
 
-  async updateView(projectId: number, viewId: number, data: Partial<{ title: string; filter: string; position: number; bucket_configuration_mode: number; default_bucket_id: number; done_bucket_id: number }>): Promise<VikunjaView> {
+  async updateView(projectId: number, viewId: number, data: Partial<{ title: string; filter: string; position: number; bucket_configuration_mode: string; default_bucket_id: number; done_bucket_id: number }>): Promise<VikunjaView> {
     return this.request<VikunjaView>('POST', `/projects/${projectId}/views/${viewId}`, data);
   }
 
@@ -93,8 +93,8 @@ export class VikunjaClient {
     await this.request<{ message: string }>('DELETE', `/projects/${projectId}/views/${viewId}/buckets/${bucketId}`);
   }
 
-  async moveTaskToBucket(projectId: number, viewId: number, data: { task_id: number; bucket_id: number }): Promise<void> {
-    await this.request<unknown>('POST', `/projects/${projectId}/views/${viewId}/buckets/tasks`, data);
+  async moveTaskToBucket(projectId: number, viewId: number, bucketId: number, taskId: number): Promise<VikunjaTaskBucket> {
+    return this.request<VikunjaTaskBucket>('POST', `/projects/${projectId}/views/${viewId}/buckets/${bucketId}/tasks`, { task_id: taskId });
   }
 
   // Tasks

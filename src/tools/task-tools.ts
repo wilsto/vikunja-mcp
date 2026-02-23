@@ -126,18 +126,21 @@ export function taskTools(server: McpServer, client: VikunjaClient): void {
     };
   });
 
+  const bulkCreateSchema = {
+    project_id: z.number().describe('Project ID to create tasks in'),
+    tasks: z.array(z.object({
+      title: z.string().describe('Task title'),
+      description: z.string().optional().describe('Task description'),
+      done: z.boolean().optional().describe('Mark as completed'),
+      priority: z.number().optional().describe('Priority (0-4)'),
+      due_date: z.string().optional().describe('Due date in ISO format'),
+    })).describe('Array of tasks to create'),
+  } as const;
+
+  // @ts-expect-error TS2589 - MCP SDK deep type instantiation with Zod optional schemas
   server.registerTool('vikunja_bulk_create_tasks', {
     description: 'Create multiple tasks at once in a project',
-    inputSchema: {
-      project_id: z.number().describe('Project ID to create tasks in'),
-      tasks: z.array(z.object({
-        title: z.string().describe('Task title'),
-        description: z.string().optional().describe('Task description'),
-        done: z.boolean().optional().describe('Mark as completed'),
-        priority: z.number().optional().describe('Priority (0-4)'),
-        due_date: z.string().optional().describe('Due date in ISO format'),
-      })).describe('Array of tasks to create'),
-    },
+    inputSchema: bulkCreateSchema,
   }, async ({ project_id, tasks }) => {
     const results: string[] = [];
     for (const taskData of tasks) {
