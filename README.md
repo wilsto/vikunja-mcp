@@ -57,7 +57,7 @@ Or run from a local clone:
 
 ### Views
 - **vikunja_list_views** — List all views for a project (list, kanban, table, gantt)
-- **vikunja_create_view** — Create a new view (view kinds: 0=list, 1=gantt, 2=table, 3=kanban)
+- **vikunja_create_view** — Create a new view (view kinds: "list", "gantt", "table", "kanban")
 - **vikunja_update_view** — Update a view's title, filter, or bucket configuration
 - **vikunja_delete_view** — Delete a project view
 
