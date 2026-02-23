@@ -7,6 +7,8 @@ import { taskTools } from './task-tools.js';
 import { labelTools } from './label-tools.js';
 import { commentTools } from './comment-tools.js';
 import { relationTools } from './relation-tools.js';
+import { assigneeTools } from './assignee-tools.js';
+import { attachmentTools } from './attachment-tools.js';
 
 export function registerTools(server: McpServer, client: VikunjaClient): void {
   projectTools(server, client);
@@ -16,4 +18,6 @@ export function registerTools(server: McpServer, client: VikunjaClient): void {
   labelTools(server, client);
   commentTools(server, client);
   relationTools(server, client);
+  assigneeTools(server, client);
+  attachmentTools(server, client);
 }

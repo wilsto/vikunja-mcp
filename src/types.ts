@@ -109,3 +109,17 @@ export interface VikunjaBucket {
   updated: string;
   created_by: VikunjaUser;
 }
+
+export interface VikunjaTaskAttachment {
+  id: number;
+  task_id: number;
+  file: {
+    id: number;
+    name: string;
+    mime: string;
+    size: number;
+    created: string;
+  };
+  created_by: VikunjaUser;
+  created: string;
+}

@@ -1,6 +1,6 @@
 # vikunja-mcp
 
-MCP server for [Vikunja](https://vikunja.io), the open-source task management app. Provides 31 tools for managing projects, views, kanban buckets, tasks, labels, comments, and task relations through Claude Code or any MCP-compatible client.
+MCP server for [Vikunja](https://vikunja.io), the open-source task management app. Provides 37 tools for managing projects, views, kanban buckets, tasks, labels, comments, task relations, assignees, and attachments through Claude Code or any MCP-compatible client.
 
 ## Setup
 
@@ -47,7 +47,7 @@ Or run from a local clone:
 }
 ```
 
-## Tools (31)
+## Tools (37)
 
 ### Projects
 - **vikunja_list_projects** — List all projects
@@ -95,6 +95,18 @@ Or run from a local clone:
 
 - **vikunja_create_relation** — Create a relation between two tasks (subtask, blocking, related, etc.)
 - **vikunja_delete_relation** — Remove a relation between two tasks
+
+### Assignees
+
+- **vikunja_list_assignees** — List all users assigned to a task
+- **vikunja_assign_user** — Assign a user to a task
+- **vikunja_unassign_user** — Remove a user from a task
+
+### Attachments
+
+- **vikunja_list_attachments** — List all attachments on a task
+- **vikunja_upload_attachment** — Upload a file attachment to a task (base64-encoded)
+- **vikunja_delete_attachment** — Delete an attachment from a task
 
 ## Build from Source
 

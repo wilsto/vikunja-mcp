@@ -1,4 +1,4 @@
-import type { VikunjaProject, VikunjaTask, VikunjaLabel, VikunjaView, VikunjaBucket, VikunjaTaskBucket, VikunjaComment, VikunjaTaskRelation } from './types.js';
+import type { VikunjaProject, VikunjaTask, VikunjaLabel, VikunjaView, VikunjaBucket, VikunjaTaskBucket, VikunjaComment, VikunjaTaskRelation, VikunjaUser, VikunjaTaskAttachment } from './types.js';
 
 export class VikunjaClient {
   private baseUrl: string;
@@ -176,5 +176,63 @@ export class VikunjaClient {
 
   async deleteRelation(taskId: number, relationKind: string, otherTaskId: number): Promise<void> {
     await this.request<{ message: string }>('DELETE', `/tasks/${taskId}/relations/${relationKind}/${otherTaskId}`);
+  }
+
+  // Assignees
+  async listAssignees(taskId: number): Promise<VikunjaUser[]> {
+    const task = await this.request<VikunjaTask>('GET', `/tasks/${taskId}`);
+    return task.assignees || [];
+  }
+
+  async assignUser(taskId: number, userId: number): Promise<VikunjaUser> {
+    return this.request<VikunjaUser>('PUT', `/tasks/${taskId}/assignees`, { user_id: userId });
+  }
+
+  async unassignUser(taskId: number, userId: number): Promise<void> {
+    await this.request<{ message: string }>('DELETE', `/tasks/${taskId}/assignees/${userId}`);
+  }
+
+  // Attachments
+  async listAttachments(taskId: number): Promise<VikunjaTaskAttachment[]> {
+    return this.request<VikunjaTaskAttachment[]>('GET', `/tasks/${taskId}/attachments`);
+  }
+
+  async uploadAttachment(taskId: number, fileName: string, fileContent: Buffer, mimeType: string): Promise<VikunjaTaskAttachment> {
+    const url = `${this.baseUrl}/tasks/${taskId}/attachments`;
+    const boundary = '----MCPBoundary' + Date.now();
+    const CRLF = '\r\n';
+
+    const header = `--${boundary}${CRLF}Content-Disposition: form-data; name="files"; filename="${fileName}"${CRLF}Content-Type: ${mimeType}${CRLF}${CRLF}`;
+    const footer = `${CRLF}--${boundary}--${CRLF}`;
+
+    const body = Buffer.concat([
+      Buffer.from(header),
+      fileContent,
+      Buffer.from(footer),
+    ]);
+
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${this.token}`,
+        'Content-Type': `multipart/form-data; boundary=${boundary}`,
+      },
+      body,
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`Vikunja API error ${response.status}: ${text}`);
+    }
+
+    const result = await response.json() as { errors: unknown[] | null; success: VikunjaTaskAttachment[] };
+    if (!result.success?.length) {
+      throw new Error('Attachment upload failed: no attachment returned');
+    }
+    return result.success[0];
+  }
+
+  async deleteAttachment(taskId: number, attachmentId: number): Promise<void> {
+    await this.request<{ message: string }>('DELETE', `/tasks/${taskId}/attachments/${attachmentId}`);
   }
 }
