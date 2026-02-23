@@ -33,24 +33,38 @@ export function taskTools(server: McpServer, client: VikunjaClient): void {
   });
 
   server.registerTool('vikunja_list_project_tasks', {
-    description: 'List tasks within a specific project',
+    description: 'List tasks within a specific project. Use bucket_id to filter by kanban column (e.g., "Doing").',
     inputSchema: {
       project_id: z.number().describe('Project ID'),
+      view_id: z.number().optional().describe('View ID to use (uses first view if not specified)'),
+      bucket_id: z.number().optional().describe('Filter tasks by bucket (kanban column) ID'),
       page: z.number().optional().describe('Page number'),
       per_page: z.number().optional().describe('Tasks per page'),
-      filter: z.string().optional().describe('Vikunja filter string'),
+      filter: z.string().optional().describe('Vikunja filter string (e.g., "done = false")'),
     },
-  }, async ({ project_id, ...params }) => {
-    // Get the first view for this project
+  }, async ({ project_id, view_id, bucket_id, ...params }) => {
     const views = await client.getProjectViews(project_id);
     if (!views.length) return { content: [{ type: 'text', text: 'Project has no views.' }] };
 
-    const tasks = await client.listProjectTasks(project_id, views[0].id, params);
+    let resolvedViewId = view_id;
+    if (!resolvedViewId) {
+      // When filtering by bucket, buckets only exist on kanban views — auto-select one
+      const kanbanView = bucket_id !== undefined ? views.find(v => v.view_kind === 'kanban') : undefined;
+      resolvedViewId = (kanbanView ?? views[0]).id;
+    }
+
+    if (bucket_id !== undefined) {
+      const bucketFilter = `bucket_id = ${bucket_id}`;
+      params.filter = params.filter ? `${bucketFilter} && ${params.filter}` : bucketFilter;
+    }
+
+    const tasks = await client.listProjectTasks(project_id, resolvedViewId, params);
     if (!tasks.length) return { content: [{ type: 'text', text: 'No tasks in this project.' }] };
 
     const lines = tasks.map(formatTask).join('\n');
+    const bucketSuffix = bucket_id !== undefined ? ` in bucket #${bucket_id}` : '';
     return {
-      content: [{ type: 'text', text: `${tasks.length} task(s) in project #${project_id}:\n${lines}` }],
+      content: [{ type: 'text', text: `${tasks.length} task(s) in project #${project_id}${bucketSuffix}:\n${lines}` }],
     };
   });
 
