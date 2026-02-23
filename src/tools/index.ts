@@ -5,6 +5,8 @@ import { viewTools } from './view-tools.js';
 import { bucketTools } from './bucket-tools.js';
 import { taskTools } from './task-tools.js';
 import { labelTools } from './label-tools.js';
+import { commentTools } from './comment-tools.js';
+import { relationTools } from './relation-tools.js';
 
 export function registerTools(server: McpServer, client: VikunjaClient): void {
   projectTools(server, client);
@@ -12,4 +14,6 @@ export function registerTools(server: McpServer, client: VikunjaClient): void {
   bucketTools(server, client);
   taskTools(server, client);
   labelTools(server, client);
+  commentTools(server, client);
+  relationTools(server, client);
 }

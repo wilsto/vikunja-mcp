@@ -83,6 +83,22 @@ export interface VikunjaTaskBucket {
   task_done?: boolean;
 }
 
+export interface VikunjaComment {
+  id: number;
+  comment: string;
+  author: VikunjaUser;
+  created: string;
+  updated: string;
+}
+
+export interface VikunjaTaskRelation {
+  task_id: number;
+  other_task_id: number;
+  relation_kind: string;
+  created_by?: VikunjaUser;
+  created?: string;
+}
+
 export interface VikunjaBucket {
   id: number;
   title: string;

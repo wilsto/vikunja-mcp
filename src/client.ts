@@ -1,4 +1,4 @@
-import type { VikunjaProject, VikunjaTask, VikunjaLabel, VikunjaView, VikunjaBucket, VikunjaTaskBucket } from './types.js';
+import type { VikunjaProject, VikunjaTask, VikunjaLabel, VikunjaView, VikunjaBucket, VikunjaTaskBucket, VikunjaComment, VikunjaTaskRelation } from './types.js';
 
 export class VikunjaClient {
   private baseUrl: string;
@@ -150,5 +150,31 @@ export class VikunjaClient {
 
   async removeLabelFromTask(taskId: number, labelId: number): Promise<void> {
     await this.request<{ message: string }>('DELETE', `/tasks/${taskId}/labels/${labelId}`);
+  }
+
+  // Comments
+  async listComments(taskId: number): Promise<VikunjaComment[]> {
+    return this.request<VikunjaComment[]>('GET', `/tasks/${taskId}/comments`);
+  }
+
+  async createComment(taskId: number, comment: string): Promise<VikunjaComment> {
+    return this.request<VikunjaComment>('PUT', `/tasks/${taskId}/comments`, { comment });
+  }
+
+  async updateComment(taskId: number, commentId: number, comment: string): Promise<VikunjaComment> {
+    return this.request<VikunjaComment>('POST', `/tasks/${taskId}/comments/${commentId}`, { comment });
+  }
+
+  async deleteComment(taskId: number, commentId: number): Promise<void> {
+    await this.request<{ message: string }>('DELETE', `/tasks/${taskId}/comments/${commentId}`);
+  }
+
+  // Relations
+  async createRelation(taskId: number, otherTaskId: number, relationKind: string): Promise<VikunjaTaskRelation> {
+    return this.request<VikunjaTaskRelation>('PUT', `/tasks/${taskId}/relations`, { other_task_id: otherTaskId, relation_kind: relationKind });
+  }
+
+  async deleteRelation(taskId: number, relationKind: string, otherTaskId: number): Promise<void> {
+    await this.request<{ message: string }>('DELETE', `/tasks/${taskId}/relations/${relationKind}/${otherTaskId}`);
   }
 }

@@ -5,3 +5,4 @@ dist/
 .env.*
 batch_migrate.sh
 migrate.sh
+CLAUDE.md
